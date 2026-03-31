@@ -6,12 +6,12 @@
     "url": "https://github.com/dclavijo/mcp-sqlite3",
     "source": "github"
   },
-  "version": "0.1.0",
+  "version": "0.1.1",
   "packages": [
     {
       "registryType": "pypi",
       "identifier": "mcp-sqlite3",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "transport": {
         "type": "stdio"
       }
