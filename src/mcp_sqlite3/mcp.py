@@ -985,16 +985,15 @@ def create_python_aggregate(
         finalize_namespace: dict[str, Any] = {}
         exec(finalize_code, finalize_namespace)
 
-        class AggregateClass:
-            def __init__(self) -> None:
-                self._step = step_namespace["Step"]()
-                self._final = finalize_namespace["Final"]()
+        step_obj = step_namespace["Step"]()
+        final_obj = finalize_namespace["Final"]()
 
+        class AggregateClass:
             def step(self, *args: Any) -> None:
-                self._step.step(*args)
+                step_obj.step(*args)
 
             def finalize(self) -> Any:
-                return self._final.finalize()
+                return final_obj.finalize()
 
         conn.create_aggregate(name, n_arg, AggregateClass)
         return _format_result(True)

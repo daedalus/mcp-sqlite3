@@ -533,3 +533,248 @@ class TestResources:
         assert "tables" in schema_data
 
         close_connection(conn_id)
+
+
+class TestSchemaAdvanced:
+    def test_get_foreign_keys(self):
+        from mcp_sqlite3.mcp import (
+            close_connection,
+            connect_database,
+            create_table,
+            execute_script,
+            get_foreign_keys,
+        )
+
+        result = connect_database(":memory:")
+        conn_id = result["data"]["conn_id"]
+
+        execute_script(
+            conn_id,
+            """
+            CREATE TABLE users (id INTEGER PRIMARY KEY);
+            CREATE TABLE orders (id INTEGER PRIMARY KEY, user_id INTEGER REFERENCES users(id));
+        """,
+        )
+
+        fk_result = get_foreign_keys(conn_id, "orders")
+        assert fk_result["success"] is True
+        assert len(fk_result["data"]) > 0
+
+        close_connection(conn_id)
+
+    def test_get_indexes(self):
+        from mcp_sqlite3.mcp import (
+            close_connection,
+            connect_database,
+            create_table,
+            execute_script,
+            get_indexes,
+        )
+
+        result = connect_database(":memory:")
+        conn_id = result["data"]["conn_id"]
+
+        execute_script(
+            conn_id,
+            """
+            CREATE TABLE test (id INTEGER PRIMARY KEY, name TEXT);
+            CREATE INDEX idx_name ON test(name);
+        """,
+        )
+
+        indexes_result = get_indexes(conn_id, "test")
+        assert indexes_result["success"] is True
+
+        all_indexes = get_indexes(conn_id)
+        assert all_indexes["success"] is True
+
+        close_connection(conn_id)
+
+
+class TestBackupAdvanced:
+    def test_restore_database(self):
+        import os
+        import tempfile
+
+        from mcp_sqlite3.mcp import (
+            backup_database,
+            close_connection,
+            connect_database,
+            create_table,
+            insert_row,
+            restore_database,
+        )
+
+        result = connect_database(":memory:")
+        conn_id = result["data"]["conn_id"]
+
+        create_table(conn_id, "test", [{"name": "id", "type": "INTEGER", "pk": True}])
+        insert_row(conn_id, "test", {"id": 1})
+
+        with tempfile.NamedTemporaryFile(suffix=".db", delete=False) as f:
+            backup_path = f.name
+
+        try:
+            backup_database(conn_id, backup_path)
+            close_connection(conn_id)
+
+            result2 = connect_database(":memory:")
+            conn_id2 = result2["data"]["conn_id"]
+
+            restore_result = restore_database(conn_id2, backup_path)
+            assert restore_result["success"] is True
+
+            close_connection(conn_id2)
+        finally:
+            os.unlink(backup_path)
+
+    def test_serialize_database(self):
+        from mcp_sqlite3.mcp import (
+            close_connection,
+            connect_database,
+            create_table,
+            insert_row,
+            serialize_database,
+        )
+
+        result = connect_database(":memory:")
+        conn_id = result["data"]["conn_id"]
+
+        create_table(conn_id, "test", [{"name": "id", "type": "INTEGER", "pk": True}])
+        insert_row(conn_id, "test", {"id": 1})
+
+        serialize_result = serialize_database(conn_id)
+        assert serialize_result["success"] is True
+        assert isinstance(serialize_result["data"], str)
+
+        close_connection(conn_id)
+
+    def test_export_sql_dump(self):
+        from mcp_sqlite3.mcp import (
+            close_connection,
+            connect_database,
+            execute_script,
+            export_sql_dump,
+        )
+
+        result = connect_database(":memory:")
+        conn_id = result["data"]["conn_id"]
+
+        execute_script(
+            conn_id,
+            """
+            CREATE TABLE test (id INTEGER PRIMARY KEY, name TEXT);
+        """,
+        )
+
+        dump_result = export_sql_dump(conn_id)
+        assert dump_result["success"] is True
+        assert "CREATE TABLE" in dump_result["data"]
+
+        close_connection(conn_id)
+
+
+class TestFunctionRegistration:
+    def test_create_python_function(self):
+        from mcp_sqlite3.mcp import (
+            close_connection,
+            connect_database,
+            create_python_function,
+            execute_query,
+        )
+
+        result = connect_database(":memory:")
+        conn_id = result["data"]["conn_id"]
+
+        func_code = """
+def func(x):
+    return str(x).upper()
+"""
+        func_result = create_python_function(conn_id, "my_upper", func_code)
+        assert func_result["success"] is True
+
+        query_result = execute_query(conn_id, "SELECT my_upper('hello')")
+        assert query_result["success"] is True
+
+        close_connection(conn_id)
+
+    def test_create_python_aggregate(self):
+        from mcp_sqlite3.mcp import (
+            close_connection,
+            connect_database,
+            create_python_aggregate,
+            execute_query,
+        )
+
+        result = connect_database(":memory:")
+        conn_id = result["data"]["conn_id"]
+
+        step_code = """
+class Step:
+    def __init__(self):
+        self.count = 0
+    def step(self, value):
+        self.count += 1
+"""
+        finalize_code = """
+class Final:
+    def finalize(self):
+        return self.count
+"""
+
+        agg_result = create_python_aggregate(
+            conn_id, "my_count", step_code, finalize_code
+        )
+        assert agg_result["success"] is True
+
+        close_connection(conn_id)
+
+    def test_register_adapter(self):
+        from mcp_sqlite3.mcp import register_adapter
+
+        result = register_adapter("datetime", "TEXT")
+        assert result["success"] is True
+
+        result = register_adapter("date", "TEXT")
+        assert result["success"] is True
+
+        result = register_adapter("time", "TEXT")
+        assert result["success"] is True
+
+    def test_register_converter(self):
+        from mcp_sqlite3.mcp import register_converter
+
+        converter_code = """
+def convert(data):
+    return int(data)
+"""
+        result = register_converter("MYINT", converter_code)
+        assert result["success"] is True
+
+
+class TestFetchResults:
+    def test_fetch_results(self):
+        from mcp_sqlite3.mcp import (
+            close_connection,
+            connect_database,
+            execute_query,
+            execute_script,
+            fetch_results,
+        )
+
+        result = connect_database(":memory:")
+        conn_id = result["data"]["conn_id"]
+
+        execute_script(
+            conn_id,
+            "CREATE TABLE test (x); INSERT INTO test VALUES (1); INSERT INTO test VALUES (2);",
+        )
+
+        query_result = execute_query(conn_id, "SELECT * FROM test")
+        assert query_result["success"] is True
+        cursor_id = query_result["data"]["cursor_id"]
+
+        fetch_result = fetch_results(conn_id, cursor_id)
+        assert fetch_result["success"] is True
+
+        close_connection(conn_id)
