@@ -51,7 +51,7 @@ Exposes complete sqlite3 functionality as MCP tools.
 ## Development
 
 ```bash
-git clone https://github.com/dclavijo/mcp-sqlite3.git
+git clone https://github.com/daedalus/mcp-sqlite3.git
 cd mcp-sqlite3
 pip install -e ".[test]"
 
@@ -70,4 +70,4 @@ mypy src/
 
 ## MCP Server
 
-mcp-name: io.github.dclavijo/mcp-sqlite3
+mcp-name: io.github.daedalus/mcp-sqlite3
