@@ -10,7 +10,7 @@ readme = "README.md"
 requires-python = ">=3.11"
 license = {text = "MIT"}
 authors = [
-    {name = "dclavijo", email = "dclavijo@example.com"}
+    {name = "Dario Clavijo", email = "clavijodario@gmail.com"}
 ]
 dependencies = ["fastmcp>=0.1.0"]
 
@@ -54,7 +54,7 @@ select = ["E", "F", "W", "I", "UP", "ANN", "TCH", "N", "C4", "ARG"]
 ignore = ["E501", "ANN201", "ANN001", "ANN401", "ARG001", "ARG002", "ARG005"]
 
 [tool.ruff.lint.per-file-ignores]
-"__init__.py" = ["F401"]
+"__init__.py" = ["F401", "F403"]
 "tests/**" = ["ANN", "ARG", "F401"]
 
 [tool.ruff.lint.pydocstyle]
