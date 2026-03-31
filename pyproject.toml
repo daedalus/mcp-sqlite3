@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "mcp-sqlite3"
-version = "0.1.0"
+version = "0.1.2"
 description = "MCP server exposing sqlite3 library functionality"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -35,9 +35,9 @@ lint = [
 all = ["mcp-sqlite3[dev,test,lint]"]
 
 [project.urls]
-Homepage = "https://github.com/dclavijo/mcp-sqlite3"
-Repository = "https://github.com/dclavijo/mcp-sqlite3"
-Issues = "https://github.com/dclavijo/mcp-sqlite3/issues"
+Homepage = "https://github.com/daedalus/mcp-sqlite3"
+Repository = "https://github.com/daedalus/mcp-sqlite3"
+Issues = "https://github.com/daedalus/mcp-sqlite3/issues"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/mcp_sqlite3"]
