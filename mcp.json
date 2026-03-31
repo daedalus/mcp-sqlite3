@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "mcp-sqlite3": {
+      "command": "mcp-sqlite3",
+      "env": {}
+    }
+  }
+}

@@ -1,0 +1,80 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "mcp-sqlite3"
+version = "0.1.0"
+description = "MCP server exposing sqlite3 library functionality"
+readme = "README.md"
+requires-python = ">=3.11"
+license = {text = "MIT"}
+authors = [
+    {name = "dclavijo", email = "dclavijo@example.com"}
+]
+dependencies = ["fastmcp>=0.1.0"]
+
+[project.optional-dependencies]
+dev = [
+    "ruff",
+    "mypy",
+    "hatch",
+    "pip-api",
+]
+test = [
+    "pytest",
+    "pytest-cov",
+    "pytest-mock",
+    "pytest-asyncio",
+    "hypothesis",
+]
+lint = [
+    "ruff",
+    "mypy",
+]
+all = ["mcp-sqlite3[dev,test,lint]"]
+
+[project.urls]
+Homepage = "https://github.com/dclavijo/mcp-sqlite3"
+Repository = "https://github.com/dclavijo/mcp-sqlite3"
+Issues = "https://github.com/dclavijo/mcp-sqlite3/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/mcp_sqlite3"]
+
+[tool.hatch.build.targets.sdist]
+include = ["src/mcp_sqlite3"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "ANN", "TCH", "N", "C4", "ARG"]
+ignore = ["E501", "ANN201", "ANN001", "ANN401", "ARG001", "ARG002", "ARG005"]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"]
+"tests/**" = ["ANN", "ARG", "F401"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+warn_return_any = true
+warn_unused_ignores = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-v --tb=short --cov=src --cov-fail-under=50"
+filterwarnings = ["ignore::DeprecationWarning"]
+
+[tool.coverage.run]
+source = ["src"]
+branch = true
+
+[tool.coverage.report]
+exclude_files = ["tests/*", "*/__init__.py"]
+

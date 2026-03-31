@@ -1,0 +1,20 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.dclavijo/mcp-sqlite3",
+  "description": "MCP server exposing sqlite3 library functionality",
+  "repository": {
+    "url": "https://github.com/dclavijo/mcp-sqlite3",
+    "source": "github"
+  },
+  "version": "0.1.0",
+  "packages": [
+    {
+      "registryType": "pypi",
+      "identifier": "mcp-sqlite3",
+      "version": "0.1.0",
+      "transport": {
+        "type": "stdio"
+      }
+    }
+  ]
+}
